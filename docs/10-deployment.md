@@ -50,9 +50,21 @@ appearing broken.
 the site root and not to look for a build. `cleanUrls` serves `/assess` rather than `/assess.html`.
 `trailingSlash: false` keeps one canonical form of every path.
 
-`.vercelignore` keeps Python, tests, documentation and `render.yaml` out of the upload. This is not
-only tidiness: a `requirements.txt` at the repository root is enough for a platform to guess that
-the project is a Python application and try to build it as one.
+`framework` is `null`, which the `vercel.json` reference defines as selecting the "Other" preset.
+This line is load-bearing, and its absence is the one way this deploy is known to fail. When a
+repository is first imported, Vercel inspects it and stores a framework on the project. A
+`requirements.txt` listing `fastapi` is enough for it to store FastAPI, after which every build runs
+a Python build that looks for an ASGI entrypoint in `app.py`, `index.py`, `main.py` and similar,
+finds none, and fails. The stored setting is what runs, so no amount of excluding files changes the
+outcome. Pinning the preset in the repository rather than the dashboard means re-importing the
+project cannot bring the failure back.
+
+`.vercelignore` keeps the Python package, tests, documentation and `render.yaml` out of the
+deployment. It applies to Git deployments as well as CLI ones: the build log reports `Found
+.vercelignore` and the number of files removed. The sequence is clone first, then delete, so the
+files do reach the build machine and are then discarded before the build runs. This is why it does
+not prevent framework detection, which happened once at import time and is now a stored project
+setting rather than something re-derived from the files on each build.
 
 Cache headers are set per path. Fingerprinted static assets are immutable for a year. `config.js`
 is explicitly `no-cache`, because it is the one file whose contents change between environments and

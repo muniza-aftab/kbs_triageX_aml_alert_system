@@ -13,6 +13,7 @@ the result. If it ever starts deciding things, that is a second knowledge base n
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
@@ -387,6 +388,14 @@ def test_deployment_config_separates_the_two_platforms() -> None:
 
     assert '"outputDirectory": "frontend"' in vercel
     assert "backend" not in vercel, "Vercel must not try to build the Python API"
+
+    # A requirements.txt holding fastapi is enough for Vercel to store FastAPI as the project
+    # framework when the repository is first imported, and it then runs a Python build that has
+    # no entrypoint and fails. Removing the files with .vercelignore does not undo the stored
+    # setting. Per the vercel.json reference, null selects the "Other" preset, so this line is
+    # what keeps the front end a static deploy. It belongs in the repository rather than the
+    # dashboard so that re-importing the project cannot resurrect the failure.
+    assert json.loads(vercel)["framework"] is None, "framework must be null, meaning Other"
     assert "uvicorn backend.index:app" in render_yaml
     assert "/api/health" in render_yaml
     assert "backend/" in ignore and "src/" in ignore
