@@ -1,0 +1,11 @@
+# Vercel deploys the static front end only. The API lives on Render.
+backend/
+src/
+tests/
+experiments/
+docs/
+results/
+*.py
+pyproject.toml
+requirements.txt
+render.yaml

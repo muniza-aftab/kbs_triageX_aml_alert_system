@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Worked examples | TriageX</title>
+<meta name="description" content="Twenty-four worked money-laundering alert examples, each with the decision the system reaches and why.">
+<link rel="stylesheet" href="/static/css/main.css">
+<script src="/config.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<header class="masthead">
+  <div class="masthead__inner">
+    <a class="masthead__title" href="/">TriageX</a>
+    <span class="masthead__strapline">Intelligent AML Alert Triage &amp; Risk Prioritization</span>
+  </div>
+</header>
+
+<nav class="primary" aria-label="Sections">
+  <ul>
+    <li><a href="/">Overview</a></li>
+    <li><a href="/assess.html">Assess an alert</a></li>
+    <li><a href="/cases.html">Worked examples</a></li>
+    <li><a href="/about.html">How it works</a></li>
+  </ul>
+</nav>
+
+<div class="notice">
+  <p><strong>Demonstration system.</strong> Every example below is invented. No real customer or
+  transaction appears anywhere in this system.</p>
+</div>
+
+<main id="main">
+  <h1>Worked examples</h1>
+
+  <p class="lede">Each example was written to test one specific thing the system should do. Every
+  one records, in its own file, the decision it is expected to receive, so if the rules change
+  and an example stops behaving, the test suite fails.</p>
+
+  <p>Some of these exist to show the system getting a hard case <em>right</em>. Others exist to
+  show it declining, including one where declining is arguably unhelpful and it does so anyway.
+  Those are the interesting ones.</p>
+
+  <div class="field">
+    <label for="filter">Show</label>
+    <select id="filter">
+      <option value="all">All examples</option>
+      <option value="clear">Closed</option>
+      <option value="monitor">Closed with monitoring</option>
+      <option value="request_evidence">Evidence requested</option>
+      <option value="refer_to_investigation">Referred to an investigator</option>
+      <option value="refuse_to_decide">Could not decide</option>
+    </select>
+  </div>
+
+  <div id="list">
+    <p class="loading">Loading examples…</p>
+  </div>
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <p>Examples are stored as readable text files in the repository and doubled as automated
+    tests. The notes on each one explain why it exists.</p>
+    <p><a href="/assess.html">Assess your own alert</a> · <a href="/about.html">How it works</a></p>
+  </div>
+</footer>
+
+<script type="module">
+import { api, el, clear, showError } from "/static/js/app.js";
+
+const list = document.getElementById("list");
+const filter = document.getElementById("filter");
+let rows = [];
+
+function draw() {
+  const wanted = filter.value;
+  const shown = wanted === "all" ? rows : rows.filter((r) => r.outcome.key === wanted);
+
+  clear(list);
+
+  if (!shown.length) {
+    list.append(el("p", { text: "No examples match that filter." }));
+    return;
+  }
+
+  list.append(
+    el("p", { class: "hint", text: `Showing ${shown.length} of ${rows.length} examples.` }));
+
+  const table = el("table", {}, [
+    el("thead", {}, [
+      el("tr", {}, [
+        el("th", { scope: "col" }, "Reference"),
+        el("th", { scope: "col" }, "Decision"),
+        el("th", { scope: "col" }, "What this example is for"),
+      ]),
+    ]),
+    el(
+      "tbody",
+      {},
+      shown.map((row) =>
+        el("tr", {}, [
+          el("th", { scope: "row" }, [
+            el("a", { href: `/case.html?id=${encodeURIComponent(row.alert)}`, text: row.alert }),
+          ]),
+          el("td", {}, [el("span", { class: `tag ${row.outcome.tone}`, text: row.outcome.short })]),
+          el("td", { text: row.notes || row.name }),
+        ]))),
+  ]);
+  list.append(table);
+}
+
+try {
+  const data = await api("/cases");
+  rows = data.cases;
+  draw();
+  filter.addEventListener("change", draw);
+} catch (error) {
+  showError(list, error.message);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+alert_id = "ALT-6004"
+trigger_rule = "TM-PEP"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["adversarial", "pep"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-6004"
+onboarding_date = 2017-01-23
+expected_monthly_turnover = 14000
+kyc_status = "complete"
+sanctions_signal = "none"
+pep_status = "foreign"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-6004"
+owner = "CUS-6004"
+opened_date = 2017-01-23
+balance = 41000
+last_activity_date = 2026-02-27
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-EMPLOYER"
+jurisdiction = "AL"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-SALARY"
+account = "ACC-6004"
+amount = 12000
+timestamp = 2026-03-02T08:00:00
+channel = "api"
+counterparty = "CP-EMPLOYER"
+
+[expected]
+must_not_fire = ["TYP-PEP-01"]
+notes = """A foreign PEP transacting entirely within profile. PEP status requires enhanced
+diligence, not suspicion - TYP-PEP-01 needs a second premise precisely so that being a PEP
+is never by itself treated as evidence of wrongdoing."""

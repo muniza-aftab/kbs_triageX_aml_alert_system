@@ -1,0 +1,37 @@
+alert_id = "ALT-3001"
+trigger_rule = "TM-CASH-AGG"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["request_evidence", "structuring", "canonical"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-3001"
+onboarding_date = 2026-02-08
+expected_monthly_turnover = 2200
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "absent"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-3001"
+owner = "CUS-3001"
+opened_date = 2026-02-08
+balance = 410
+last_activity_date = 2026-02-26
+
+[[transactions]]
+id = "T-DEP"
+account = "ACC-3001"
+amount = 2400
+timestamp = 2026-03-01T10:14:00
+channel = "branch"
+repeat = 14
+interval_hours = 10
+
+[expected]
+disposition = "request_evidence"
+must_fire = ["IND-FREQ-02", "IND-PROX-01", "IND-AGG-01", "TYP-STRUCT-01", "TYP-STRUCT-02"]
+notes = """The worked example from docs/03. Textbook structuring, but no source-of-funds
+evidence is held, so asking is cheaper than escalating on an incomplete picture."""

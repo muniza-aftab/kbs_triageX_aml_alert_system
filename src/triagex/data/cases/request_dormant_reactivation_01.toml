@@ -1,0 +1,43 @@
+alert_id = "ALT-3004"
+trigger_rule = "TM-DORMANT"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["request_evidence", "dormancy"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-3004"
+onboarding_date = 2017-05-04
+expected_monthly_turnover = 800
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "absent"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+frame = "SavingsAccount"
+id = "ACC-3004"
+owner = "CUS-3004"
+opened_date = 2017-05-04
+balance = 14200
+last_activity_date = 2025-04-02
+
+[[counterparties]]
+id = "CP-NEW"
+jurisdiction = "ES"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-BIG"
+account = "ACC-3004"
+amount = 7200
+timestamp = 2026-03-02T11:00:00
+channel = "api"
+counterparty = "CP-NEW"
+repeat = 2
+interval_hours = 72
+
+[expected]
+disposition = "request_evidence"
+must_fire = ["IND-DORM-01", "TYP-DORM-01"]
+notes = "Eleven months dormant, then two large credits from a grey-listed jurisdiction."

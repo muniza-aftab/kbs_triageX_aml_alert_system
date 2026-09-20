@@ -1,0 +1,47 @@
+alert_id = "ALT-4005"
+trigger_rule = "TM-PAYER-COUNT"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["refer", "mule"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-4005"
+onboarding_date = 2026-02-18
+expected_monthly_turnover = 1200
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-4005"
+owner = "CUS-4005"
+opened_date = 2026-02-18
+balance = 95
+last_activity_date = 2026-02-28
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-IN"
+account = "ACC-4005"
+amount = 640
+timestamp = 2026-03-01T08:00:00
+channel = "api"
+repeat = 14
+interval_hours = 9
+amount_step = 15
+
+[[transactions]]
+frame = "OutboundTransfer"
+id = "T-SWEEP"
+account = "ACC-4005"
+amount = 9500
+timestamp = 2026-03-06T22:00:00
+channel = "api"
+
+[expected]
+disposition = "refer_to_investigation"
+must_fire = ["IND-ACCT-01", "IND-VEL-01"]
+notes = """Fourteen inbound credits into a two-week-old account, swept out in one payment.
+Payer identity is unknown here, which is itself typical of real mule reporting."""

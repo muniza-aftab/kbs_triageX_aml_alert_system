@@ -1,0 +1,34 @@
+alert_id = "ALT-5004"
+trigger_rule = "TM-VELOCITY"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["refuse", "missing_premise"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-5004"
+onboarding_date = 2025-01-06
+expected_monthly_turnover = 3100
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-5004"
+owner = "CUS-5004"
+opened_date = 2025-01-06
+balance = 2400
+last_activity_date = 2026-02-27
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-IN"
+account = "ACC-5004"
+amount = 1600
+timestamp = 2026-03-03T10:00:00
+channel = "api"
+
+[expected]
+disposition = "refuse_to_decide"
+reason = "missing_premise"
+notes = "kyc_status omitted entirely. Same principle as ALT-5003, a different premise."

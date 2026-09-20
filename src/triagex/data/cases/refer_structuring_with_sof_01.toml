@@ -1,0 +1,37 @@
+alert_id = "ALT-4001"
+trigger_rule = "TM-CASH-AGG"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["refer", "structuring"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-4001"
+onboarding_date = 2026-02-08
+expected_monthly_turnover = 2200
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "inconsistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-4001"
+owner = "CUS-4001"
+opened_date = 2026-02-08
+balance = 380
+last_activity_date = 2026-02-26
+
+[[transactions]]
+id = "T-DEP"
+account = "ACC-4001"
+amount = 2450
+timestamp = 2026-03-01T09:00:00
+channel = "branch"
+repeat = 13
+interval_hours = 11
+
+[expected]
+disposition = "refer_to_investigation"
+must_fire = ["TYP-STRUCT-01", "DISP-REFER-01"]
+notes = """The same pattern as ALT-3001 but with source-of-funds evidence on file. The
+evidence is complete, so there is nothing left to ask and only the MLRO can act."""

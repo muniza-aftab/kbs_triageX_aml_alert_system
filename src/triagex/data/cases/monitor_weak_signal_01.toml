@@ -1,0 +1,49 @@
+alert_id = "ALT-2001"
+trigger_rule = "TM-THRESHOLD-PROX"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["monitor"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-2001"
+onboarding_date = 2022-01-15
+expected_monthly_turnover = 2200
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-2001"
+owner = "CUS-2001"
+opened_date = 2022-01-15
+balance = 3100
+last_activity_date = 2026-02-25
+
+[[transactions]]
+id = "T-D1"
+account = "ACC-2001"
+amount = 2600
+timestamp = 2026-03-02T10:00:00
+channel = "branch"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-D2"
+account = "ACC-2001"
+amount = 1400
+timestamp = 2026-03-04T10:00:00
+channel = "mobile"
+
+[[transactions]]
+id = "T-D3"
+account = "ACC-2001"
+amount = 1200
+timestamp = 2026-03-05T14:00:00
+channel = "atm"
+
+[expected]
+disposition = "monitor"
+notes = """Threshold-adjacent credits across three channels, turnover above profile but not
+far above. Weak support: worth watching, not worth an investigator's day."""

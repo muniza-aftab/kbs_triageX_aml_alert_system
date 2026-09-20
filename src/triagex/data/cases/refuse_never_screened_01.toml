@@ -1,0 +1,36 @@
+alert_id = "ALT-5003"
+trigger_rule = "TM-CASH-AGG"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["refuse", "missing_premise", "pessimistic-defaults"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-5003"
+onboarding_date = 2025-10-10
+expected_monthly_turnover = 2400
+kyc_status = "complete"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-5003"
+owner = "CUS-5003"
+opened_date = 2025-10-10
+balance = 1900
+last_activity_date = 2026-02-27
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-IN"
+account = "ACC-5003"
+amount = 1100
+timestamp = 2026-03-03T10:00:00
+channel = "api"
+
+[expected]
+disposition = "refuse_to_decide"
+reason = "missing_premise"
+notes = """Note what this file does NOT say: there is no sanctions_signal line at all. The
+frame default is not_checked rather than none, so the omission becomes a missing premise
+and the system refuses. A case file that forgets a check must never read as clean."""

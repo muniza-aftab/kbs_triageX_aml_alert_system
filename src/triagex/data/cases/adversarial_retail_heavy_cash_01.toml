@@ -1,0 +1,38 @@
+alert_id = "ALT-6001"
+trigger_rule = "TM-CASH-RATIO"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["adversarial", "regression"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-6001"
+onboarding_date = 2021-04-04
+expected_monthly_turnover = 2400
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-6001"
+owner = "CUS-6001"
+opened_date = 2021-04-04
+balance = 5200
+last_activity_date = 2026-02-27
+
+[[transactions]]
+id = "T-CASH"
+account = "ACC-6001"
+amount = 1900
+timestamp = 2026-03-02T11:00:00
+channel = "branch"
+repeat = 4
+interval_hours = 26
+
+[expected]
+must_not_fire = ["TYP-CASH-01", "TYP-CASH-02"]
+notes = """Regression test for a bug found at M3: the cash-intensive typology had no
+customer-segment premise, so a salaried individual banking cash looked like a business
+layering its takings. No disposition is asserted here - what matters is which typology
+does not fire."""

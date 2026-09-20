@@ -1,0 +1,46 @@
+alert_id = "ALT-5005"
+trigger_rule = "TM-GEO"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["refuse", "out_of_scope", "adversarial", "cost-of-abstention"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-5005"
+onboarding_date = 2022-06-30
+expected_monthly_turnover = 2600
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-5005"
+owner = "CUS-5005"
+opened_date = 2022-06-30
+balance = 3300
+last_activity_date = 2026-02-27
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-SALARY"
+account = "ACC-5005"
+amount = 2500
+timestamp = 2026-03-02T08:00:00
+channel = "api"
+
+[[transactions]]
+frame = "CryptoTransfer"
+id = "T-CRYPTO"
+account = "ACC-5005"
+amount = 250
+timestamp = 2026-03-04T19:00:00
+direction = "out"
+channel = "mobile"
+
+[expected]
+disposition = "refuse_to_decide"
+reason = "out_of_scope"
+notes = """Ordinary salary and a 250 pound crypto purchase. A system optimising for coverage
+would clear this. Scope is not a risk judgement, so it abstains anyway. This is the honest
+cost of the abstention design, kept in the library rather than hidden from it."""

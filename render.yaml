@@ -1,0 +1,30 @@
+# Render blueprint: the API only.
+#
+# The static front end is deployed separately to Vercel from frontend/. This service exposes the
+# JSON API and nothing else in production, though it will also serve frontend/ locally if the
+# directory is present, which makes `uvicorn backend.index:app` enough for development.
+#
+# After the first deploy, put this service's URL into frontend/config.js so the Vercel site knows
+# where to send requests, and set ALLOWED_ORIGINS below to the Vercel domain to close CORS down.
+#
+# The free instance type sleeps after inactivity, so the first request to a cold service takes a
+# few seconds. The front end says so rather than appearing broken.
+services:
+  - type: web
+    name: triagex-api
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && pip install -e .
+    startCommand: uvicorn backend.index:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      # Comma-separated list of origins permitted to call this API. Leave unset to allow any,
+      # which is safe here only because the API holds no state and exposes no user data.
+      - key: ALLOWED_ORIGINS
+        sync: false

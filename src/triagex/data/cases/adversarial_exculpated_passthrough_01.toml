@@ -1,0 +1,56 @@
+alert_id = "ALT-6003"
+trigger_rule = "TM-VELOCITY"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["adversarial", "exculpatory"]
+
+[customer]
+frame = "BusinessCustomer"
+id = "CUS-6003"
+onboarding_date = 2020-02-17
+expected_monthly_turnover = 30000
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+industry = "wholesale"
+
+[[accounts]]
+id = "ACC-6003"
+owner = "CUS-6003"
+opened_date = 2020-02-17
+balance = 26000
+last_activity_date = 2026-02-28
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-BUYER"
+jurisdiction = "BR"
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-SUPPLIER"
+jurisdiction = "CO"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-IN"
+account = "ACC-6003"
+amount = 32000
+timestamp = 2026-03-02T09:00:00
+channel = "api"
+counterparty = "CP-BUYER"
+
+[[transactions]]
+frame = "OutboundTransfer"
+id = "T-OUT"
+account = "ACC-6003"
+amount = 24000
+timestamp = 2026-03-03T09:00:00
+channel = "api"
+counterparty = "CP-SUPPLIER"
+
+[expected]
+notes = """High velocity, but a healthy closing balance. TYP-PASS-NEG-01 argues against the
+conduit reading, and the mixed-sign certainty arithmetic is what lets it do so. A system
+with only inculpatory rules would land on rapid_pass_through here."""

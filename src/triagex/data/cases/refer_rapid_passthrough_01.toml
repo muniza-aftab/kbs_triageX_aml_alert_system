@@ -1,0 +1,57 @@
+alert_id = "ALT-4004"
+trigger_rule = "TM-VELOCITY"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["refer", "passthrough"]
+
+[customer]
+frame = "BusinessCustomer"
+id = "CUS-4004"
+onboarding_date = 2025-12-01
+expected_monthly_turnover = 9000
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "inconsistent"
+adverse_media = "none"
+industry = "import agency"
+
+[[accounts]]
+frame = "PaymentAccount"
+id = "ACC-4004"
+owner = "CUS-4004"
+opened_date = 2025-12-01
+balance = 320
+last_activity_date = 2026-02-28
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-SRC"
+jurisdiction = "ES"
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-DST"
+jurisdiction = "FN"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-IN"
+account = "ACC-4004"
+amount = 24000
+timestamp = 2026-03-02T09:00:00
+channel = "api"
+counterparty = "CP-SRC"
+
+[[transactions]]
+frame = "OutboundTransfer"
+id = "T-OUT"
+account = "ACC-4004"
+amount = 23800
+timestamp = 2026-03-02T15:00:00
+channel = "api"
+counterparty = "CP-DST"
+
+[expected]
+disposition = "refer_to_investigation"
+must_fire = ["IND-VEL-01", "IND-RET-01", "TYP-PASS-01"]
+notes = "In and straight out the same day, leaving nothing. A conduit, not an account."

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works | TriageX</title>
+<meta name="description" content="How the alert assessment system reaches a decision, what it is built from, and what it cannot do.">
+<link rel="stylesheet" href="/static/css/main.css">
+<script src="/config.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<header class="masthead">
+  <div class="masthead__inner">
+    <a class="masthead__title" href="/">TriageX</a>
+    <span class="masthead__strapline">Intelligent AML Alert Triage &amp; Risk Prioritization</span>
+  </div>
+</header>
+
+<nav class="primary" aria-label="Sections">
+  <ul>
+    <li><a href="/">Overview</a></li>
+    <li><a href="/assess.html">Assess an alert</a></li>
+    <li><a href="/cases.html">Worked examples</a></li>
+    <li><a href="/about.html">How it works</a></li>
+  </ul>
+</nav>
+
+<div class="notice">
+  <p><strong>Demonstration system.</strong> Built for a portfolio, not for compliance use. It has
+  no regulatory approval and has never seen a real case.</p>
+</div>
+
+<main id="main">
+  <h1>How it works</h1>
+
+  <p class="lede">This is a rule-based system, not a trained model. Every decision it makes can be
+  traced back through named rules to the facts of the case. There is no step where a number comes
+  out of something nobody can inspect.</p>
+
+  <h2>It reasons in stages, not in one jump</h2>
+
+  <p>The easiest way to build something like this is one big table: certain inputs go in, a verdict
+  comes out. That is also the least useful way, because nobody can tell <em>why</em> it said what
+  it said, and it cannot express partial conclusions.</p>
+
+  <p>So this system works up through stages instead. Each stage may only read from the stages
+  below it, a rule is rejected at build time if it tries to skip ahead.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Stage</th>
+        <th scope="col">What it produces</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">1. Measurements</th>
+        <td>Plain arithmetic about the case. How many payments, how large, how quickly the money
+        left, how old the account is.</td>
+      </tr>
+      <tr>
+        <th scope="row">2. Observations</th>
+        <td>Named things that are true of the activity. "Payments cluster just under a review
+        threshold." No opinion about what it means yet.</td>
+      </tr>
+      <tr>
+        <th scope="row">3. Patterns</th>
+        <td>Recognised laundering methods the observations are consistent with, each with a
+        strength. This is where interpretation starts.</td>
+      </tr>
+      <tr>
+        <th scope="row">4. Assessment</th>
+        <td>Is the evidence complete? Is any of this outside what the system can judge? Does a legal
+        obligation apply?</td>
+      </tr>
+      <tr>
+        <th scope="row">5. Risk</th>
+        <td>The overall risk posture, combining pattern strength with context.</td>
+      </tr>
+      <tr>
+        <th scope="row">6. Decision</th>
+        <td>One of the five actions, chosen by a fixed order of precedence.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>A worked chain, from an actual example:</p>
+
+  <div class="panel panel--plain">
+    <p><strong>Facts.</strong> Fourteen cash deposits of £2,400 over six days. Account opened
+    three weeks ago. No evidence on file of where the money came from.</p>
+    <p><strong>Observations.</strong> Deposit frequency is extreme. Each deposit sits just under
+    the £3,000 review threshold. The total is far larger than any single deposit. The account is
+    too new to have a normal pattern.</p>
+    <p><strong>Pattern.</strong> This is strongly consistent with splitting deposits to stay under
+    a threshold.</p>
+    <p><strong>Assessment.</strong> Evidence is incomplete: the source of the money is not
+    documented. Everything else about the case is assessable.</p>
+    <p><strong>Decision.</strong> Request evidence. Specifically: ask for source-of-funds
+    documentation, which is the least intrusive thing that would settle it.</p>
+  </div>
+
+  <h2>It works out what to ask for</h2>
+
+  <p>When the system asks for evidence, it has not picked from a fixed list. It searches every
+  combination of evidence the bank could obtain, weighs each by how much effort it takes and how
+  intrusive it is for the customer, and returns the cheapest combination that would actually change
+  the decision.</p>
+
+  <p>So a sanctions screen, quick, internal, no contact with the customer, is preferred over a
+  full interview, unless only the interview would settle the matter.</p>
+
+  <p>It also reports honestly when nothing would help. If a case involves cryptoasset transfers,
+  no amount of paperwork gives this system a model of how those flows work, so it says the case
+  cannot be resolved rather than inventing a request.</p>
+
+  <h2>It can explain why it did <em>not</em> do something</h2>
+
+  <p>The useful question is rarely "why did you say that". It is "why didn't you close it". That
+  cannot be answered by showing the reasoning that <em>was</em> used, because the answer is about
+  something absent.</p>
+
+  <p>Every assessment on this site therefore lists each other decision it could have reached and
+  what specifically stopped it, for example: <em>"Evidence on file is Incomplete, and would need
+  to be Complete."</em></p>
+
+  <h2>It checks itself</h2>
+
+  <p>A separate tool inspects the rules themselves, looking for the sort of defect no individual
+  test case would reveal: two rules that contradict each other, a rule that can never fire, a
+  conclusion nothing is able to reach.</p>
+
+  <p>It has found real problems. The most instructive was a rule that recorded a UK public figure
+  as a foreign one. Every case still produced a defensible decision, so no test caught it, the
+  error was in what a fact <em>meant</em>, not in any outcome.</p>
+
+  <div id="audit">
+    <p class="loading">Checking the rule base…</p>
+  </div>
+
+  <h2>What it is built from</h2>
+
+  <p>The rules are derived from published material rather than invented: the Proceeds of Crime Act
+  2002, the Money Laundering Regulations 2017, guidance from the Joint Money Laundering Steering
+  Group and the Financial Conduct Authority, and typology work from the Financial Action Task
+  Force and the Wolfsberg Group.</p>
+
+  <p>Each rule records where it came from, and is tagged by how directly:</p>
+
+  <table class="definition">
+    <tbody>
+      <tr>
+        <th scope="row">From legislation</th>
+        <td>For example, a confirmed sanctions match must always be escalated.</td>
+      </tr>
+      <tr>
+        <th scope="row">From published guidance</th>
+        <td>For example, what "splitting deposits" looks like in practice.</td>
+      </tr>
+      <tr>
+        <th scope="row">Reconstructed</th>
+        <td>The shape comes from guidance; the numbers were set for this project. This is the
+        largest group, and saying so plainly matters.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>That last category is unavoidable. Published guidance describes what suspicious behaviour
+  looks like but deliberately leaves the actual thresholds to each firm's own risk appetite, so
+  there was nothing to copy. Every number in this system was chosen to be plausible.</p>
+
+  <h2>What it cannot do</h2>
+
+  <div class="panel">
+    <h3>It has never seen a real case</h3>
+    <p>Every example is invented, and every "correct answer" was decided by the same person who
+    wrote the rules. The performance figures on this site measure whether the system is internally
+    consistent. They are not evidence that it would work on real alerts.</p>
+  </div>
+
+  <ul>
+    <li><strong>Four kinds of laundering are deliberately excluded</strong>, trade-based
+    laundering, cryptoasset ramps, correspondent banking and trust structures. This is not a gap
+    to be filled later: a system that claims to cover everything cannot meaningfully say "this is
+    outside what can be assessed".</li>
+    <li><strong>It cannot see intent.</strong> It concludes that behaviour <em>matches a
+    pattern</em>, never that someone meant to launder money. Nothing in transaction data shows
+    intent, and claiming otherwise would be dishonest about what the system can see.</li>
+    <li><strong>It considers one customer and one alert at a time.</strong> Real monitoring looks
+    across accounts, across customers and over months. This does not.</li>
+    <li><strong>Its thresholds are untested for sensitivity.</strong> The numbers are plausible,
+    but nobody has measured how much the conclusions would move if they were set differently.
+    That is the largest known gap.</li>
+  </ul>
+
+  <h2>One result that went against the design</h2>
+
+  <p>The system was built expecting that it should also decline when a decision was simply
+  <em>close</em>, near the boundary between two conclusions. That was implemented and measured,
+  and it made things worse at every setting tested.</p>
+
+  <p>The reason is instructive. The system already gets about 98% of the cases it answers right,
+  so declining the marginal ones throws away correct answers about as often as wrong ones.</p>
+
+  <p>What does pay is declining for a <em>specific, nameable</em> reason, something outside its
+  competence, a check that has not been run. In short: knowing <em>what</em> you do not know is
+  worth a great deal. Knowing only that you are unsure is worth nothing.</p>
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <p>The full technical documentation, including the record of every change made to the rules
+    and what prompted it, lives in the project repository.</p>
+    <p><a href="/">Overview</a> · <a href="/cases.html">Worked examples</a> ·
+    <a href="/api/docs">API documentation</a></p>
+  </div>
+</footer>
+
+<script type="module">
+import { api, el, clear, showError } from "/static/js/app.js";
+
+const target = document.getElementById("audit");
+
+try {
+  const report = await api("/audit");
+  clear(target);
+  const verdict = report.clean
+    ? `No faults found across all ${report.rules_checked} rules.`
+    : `${report.errors} fault(s) found across ${report.rules_checked} rules.`;
+
+  target.append(
+    el("div", { class: `panel ${report.clean ? "" : "panel--plain"}` }, [
+      el("h3", { text: "Current state of the rule base" }),
+      el("p", { text: verdict }),
+      el("dl", { class: "meta" }, [
+        el("div", {}, [el("dt", { text: "Rules checked" }), el("dd", { text: String(report.rules_checked) })]),
+        el("div", {}, [el("dt", { text: "Faults" }), el("dd", { text: String(report.errors) })]),
+        el("div", {}, [el("dt", { text: "Warnings" }), el("dd", { text: String(report.warnings) })]),
+        el("div", {}, [el("dt", { text: "Notes" }), el("dd", { text: String(report.notes) })]),
+      ]),
+      el("p", {
+        class: "hint",
+        text: "Notes are expected: they record places where one rule deliberately refines another.",
+      }),
+    ]));
+} catch (error) {
+  showError(target, error.message);
+}
+</script>
+</body>
+</html>

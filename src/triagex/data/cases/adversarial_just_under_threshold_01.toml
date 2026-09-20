@@ -1,0 +1,37 @@
+alert_id = "ALT-6002"
+trigger_rule = "TM-THRESHOLD-PROX"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["adversarial", "structuring"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-6002"
+onboarding_date = 2023-11-11
+expected_monthly_turnover = 4000
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "absent"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-6002"
+owner = "CUS-6002"
+opened_date = 2023-11-11
+balance = 2800
+last_activity_date = 2026-02-27
+
+[[transactions]]
+id = "T-DEP"
+account = "ACC-6002"
+amount = 2995
+timestamp = 2026-03-01T09:30:00
+channel = "branch"
+repeat = 11
+interval_hours = 13
+
+[expected]
+must_fire = ["IND-PROX-01"]
+notes = """Deposits at 2,995 against a 3,000 review threshold - 99.8% of it, eleven times
+over. A flat "amount over threshold" monitor would never fire on this at all, which is the
+whole argument for modelling proximity to a threshold rather than breach of one."""

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TriageX: AML alert triage</title>
+<meta name="description" content="A rule-based system that assesses money-laundering alerts and declines to decide when it cannot justify a decision.">
+<link rel="stylesheet" href="/static/css/main.css">
+<script src="/config.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<header class="masthead">
+  <div class="masthead__inner">
+    <a class="masthead__title" href="/">TriageX</a>
+    <span class="masthead__strapline">Intelligent AML Alert Triage &amp; Risk Prioritization</span>
+  </div>
+</header>
+
+<nav class="primary" aria-label="Sections">
+  <ul>
+    <li><a href="/">Overview</a></li>
+    <li><a href="/assess.html">Assess an alert</a></li>
+    <li><a href="/cases.html">Worked examples</a></li>
+    <li><a href="/about.html">How it works</a></li>
+  </ul>
+</nav>
+
+<div class="notice">
+  <p><strong>Demonstration system.</strong> Built on invented data. Country risk ratings,
+  monetary thresholds and screening results are all fictional. Nothing on this site may be used
+  to make a decision about a real person.</p>
+</div>
+
+<main id="main">
+  <h1>Deciding what to do with a money-laundering alert</h1>
+
+  <p class="lede">Transforming complex alerts into focused investigative action.</p>
+
+  <p>A bank's monitoring software flags hundreds of alerts a day. Most are innocent behaviour that
+  happened to cross a threshold. Someone has to decide what each one means.</p>
+
+  <p>This system does that first assessment. It reads the facts of a case and recommends one of
+  five actions, with its full reasoning, and, where relevant, exactly what evidence would change
+  its mind.</p>
+
+  <p>It also does something most systems of this kind will not do: when it cannot justify a
+  decision, it says so and explains what is missing, instead of guessing.</p>
+
+  <div class="actions">
+    <a class="button" href="/assess.html">Assess an alert</a>
+    <a class="button button--secondary" href="/cases.html">See 24 worked examples</a>
+  </div>
+
+  <h2>The five possible decisions</h2>
+  <div id="outcomes">
+    <p class="loading">Loading…</p>
+  </div>
+
+  <h2>Why refusing to decide is a feature</h2>
+
+  <p>Under UK law the test for suspicion is <strong>objective</strong>. Section 330 of the
+  Proceeds of Crime Act 2002 makes it an offence to fail to disclose money laundering where a
+  person had <em>reasonable grounds</em> to suspect it, whether or not they actually did.</p>
+
+  <p>What matters, then, is what a reasonable person should have concluded from the information
+  available. A system that quietly turns its own uncertainty into a clean "close the alert" has
+  not removed that uncertainty. It has hidden it, while the legal standard still applies to the
+  firm.</p>
+
+  <div class="panel">
+    <h3>Two different reasons to involve a person</h3>
+    <p>The system distinguishes between them, because they need different responses.</p>
+    <table class="definition">
+      <tbody>
+        <tr>
+          <th scope="row">Refer to an investigator</th>
+          <td>The system knows exactly what it is looking at. It is confident, but only a
+          person with reporting authority can decide what happens next.</td>
+        </tr>
+        <tr>
+          <th scope="row">Cannot decide</th>
+          <td>The system cannot form a view at all: something is outside what it can assess, a
+          required check has not been done, or the evidence points both ways.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Does declining actually help?</h2>
+
+  <p>It was measured rather than assumed. Across 500 test cases, forcing the system to answer
+  every single one made its decisions <strong>3.5 times more costly</strong> once errors are
+  weighted by how much harm they do, because missing a real launderer matters far more than
+  taking a second look at an innocent customer.</p>
+
+  <p>A conventional scoring model built from the same signals and the same thresholds did
+  <strong>seven times worse</strong>, and missed 21 cases that should have been referred against
+  this system's 2.</p>
+
+  <p><a href="/about.html">How the system works, and what it cannot do</a></p>
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <p>A demonstration of knowledge-based systems applied to financial-crime triage. The rule
+    base is derived from published UK and international guidance; all data is synthetic.</p>
+    <p><a href="/about.html">How it works</a> · <a href="/api/docs">API documentation</a></p>
+  </div>
+</footer>
+
+<script type="module">
+import { api, el, clear, showError } from "/static/js/app.js";
+
+const target = document.getElementById("outcomes");
+
+try {
+  const { outcomes } = await api("/outcomes");
+  clear(target);
+  const table = el("table", {}, [
+    el("thead", {}, [
+      el("tr", {}, [
+        el("th", { scope: "col" }, "Decision"),
+        el("th", { scope: "col" }, "What it means"),
+        el("th", { scope: "col" }, "What happens next"),
+      ]),
+    ]),
+    el(
+      "tbody",
+      {},
+      outcomes.map((o) =>
+        el("tr", {}, [
+          el("th", { scope: "row" }, [el("span", { class: `tag ${o.tone}`, text: o.short })]),
+          el("td", { text: o.meaning }),
+          el("td", { text: o.action }),
+        ]))),
+  ]);
+  target.append(table);
+} catch (error) {
+  showError(target, error.message);
+}
+</script>
+</body>
+</html>

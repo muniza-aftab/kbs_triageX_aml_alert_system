@@ -1,0 +1,45 @@
+alert_id = "ALT-1002"
+trigger_rule = "TM-TURNOVER"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["clear", "business"]
+
+[customer]
+frame = "BusinessCustomer"
+id = "CUS-1002"
+onboarding_date = 2021-09-01
+expected_monthly_turnover = 48000
+expected_cash_ratio = 0.15
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+industry = "software consultancy"
+
+[[accounts]]
+id = "ACC-1002"
+owner = "CUS-1002"
+opened_date = 2021-09-01
+balance = 22000
+last_activity_date = 2026-02-28
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-CLIENT-A"
+jurisdiction = "BR"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-INV"
+account = "ACC-1002"
+amount = 5200
+timestamp = 2026-03-02T11:00:00
+channel = "api"
+counterparty = "CP-CLIENT-A"
+repeat = 2
+interval_hours = 48
+
+[expected]
+disposition = "clear"
+must_fire = ["IND-TURN-03", "IND-CASH-RATIO-02"]
+notes = "Invoiced revenue inside the declared profile."

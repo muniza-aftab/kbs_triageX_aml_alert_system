@@ -1,0 +1,43 @@
+alert_id = "ALT-2002"
+trigger_rule = "TM-GEO"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["monitor", "boundary"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-2002"
+onboarding_date = 2020-11-02
+expected_monthly_turnover = 3000
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-2002"
+owner = "CUS-2002"
+opened_date = 2020-11-02
+balance = 2600
+last_activity_date = 2026-02-26
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-UNRESOLVED"
+jurisdiction = "QQ"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-IN"
+account = "ACC-2002"
+amount = 1200
+timestamp = 2026-03-03T12:00:00
+channel = "api"
+counterparty = "CP-UNRESOLVED"
+
+[expected]
+disposition = "monitor"
+must_fire = ["IND-GEO-03", "POS-SCOPE-03"]
+notes = """An unrecognised country code. The case is assessable and unremarkable, but part
+of it could not be checked, so it closes with monitoring rather than full closure. Proves
+that one unknown jurisdiction does not disable the system."""

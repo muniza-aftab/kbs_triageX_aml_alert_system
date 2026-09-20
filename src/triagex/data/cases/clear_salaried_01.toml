@@ -1,0 +1,51 @@
+alert_id = "ALT-1001"
+trigger_rule = "TM-VELOCITY"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["clear", "baseline"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-1001"
+onboarding_date = 2023-04-11
+expected_monthly_turnover = 2600
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-1001"
+owner = "CUS-1001"
+opened_date = 2023-04-11
+balance = 1840
+last_activity_date = 2026-02-27
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-EMPLOYER"
+jurisdiction = "AL"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-SALARY"
+account = "ACC-1001"
+amount = 2400
+timestamp = 2026-03-02T08:00:00
+channel = "api"
+counterparty = "CP-EMPLOYER"
+narrative = "SALARY MARCH"
+
+[[transactions]]
+frame = "CardPayment"
+id = "T-RENT"
+account = "ACC-1001"
+amount = 900
+timestamp = 2026-03-03T09:12:00
+channel = "online"
+
+[expected]
+disposition = "clear"
+must_fire = ["IND-FREQ-03", "IND-KYC-03", "POS-EVID-03"]
+must_not_fire = ["TYP-STRUCT-01"]
+notes = "Ordinary salaried account. The baseline every other case is measured against."

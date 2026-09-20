@@ -1,0 +1,37 @@
+alert_id = "ALT-3002"
+trigger_rule = "TM-KYC-REVIEW"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["request_evidence", "coverage-gap"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-3002"
+onboarding_date = 2024-02-19
+expected_monthly_turnover = 2400
+kyc_status = "partial"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-3002"
+owner = "CUS-3002"
+opened_date = 2024-02-19
+balance = 2200
+last_activity_date = 2026-02-27
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-IN"
+account = "ACC-3002"
+amount = 1100
+timestamp = 2026-03-03T09:00:00
+channel = "api"
+
+[expected]
+disposition = "request_evidence"
+must_fire = ["IND-KYC-02", "POS-EVID-04"]
+notes = """Nothing suspicious in the activity, but due diligence was never completed. This
+shape found a coverage gap at M3: the decision list had no stage for an incomplete file
+with clean activity, so the case fell through to a deficiency abstention."""

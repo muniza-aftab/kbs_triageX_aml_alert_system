@@ -1,0 +1,36 @@
+alert_id = "ALT-4003"
+trigger_rule = "TM-SCREENING"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["refer", "mandatory", "sanctions"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-4003"
+onboarding_date = 2019-03-03
+expected_monthly_turnover = 2800
+kyc_status = "complete"
+sanctions_signal = "possible"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-4003"
+owner = "CUS-4003"
+opened_date = 2019-03-03
+balance = 4200
+last_activity_date = 2026-02-27
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-IN"
+account = "ACC-4003"
+amount = 1500
+timestamp = 2026-03-03T10:00:00
+channel = "api"
+
+[expected]
+disposition = "refer_to_investigation"
+must_fire = ["IND-DESIG-02", "POS-MAND-02"]
+notes = """A possible match, not a confirmed one. Automated dismissal of a possible
+designation match is exactly the decision a machine should not be making."""

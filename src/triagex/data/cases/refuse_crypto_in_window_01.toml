@@ -1,0 +1,48 @@
+alert_id = "ALT-5001"
+trigger_rule = "TM-CASH-AGG"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["refuse", "out_of_scope"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-5001"
+onboarding_date = 2024-08-14
+expected_monthly_turnover = 2600
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-5001"
+owner = "CUS-5001"
+opened_date = 2024-08-14
+balance = 2100
+last_activity_date = 2026-02-27
+
+[[transactions]]
+id = "T-DEP"
+account = "ACC-5001"
+amount = 2700
+timestamp = 2026-03-01T10:00:00
+channel = "branch"
+repeat = 6
+interval_hours = 20
+
+[[transactions]]
+frame = "CryptoTransfer"
+id = "T-CRYPTO"
+account = "ACC-5001"
+amount = 8000
+timestamp = 2026-03-05T14:00:00
+direction = "out"
+channel = "api"
+
+[expected]
+disposition = "refuse_to_decide"
+reason = "out_of_scope"
+must_fire = ["IND-SCOPE-01", "POS-SCOPE-01", "POS-REASON-01"]
+notes = """Threshold-adjacent deposits followed by a cryptoasset transfer out. The pattern
+is suspicious, which is exactly why abstaining matters here: judging it would mean judging
+the half of the case that can be modelled and presenting it as a verdict on the whole."""

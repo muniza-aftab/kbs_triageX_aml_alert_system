@@ -1,0 +1,42 @@
+alert_id = "ALT-5002"
+trigger_rule = "TM-TURNOVER"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["refuse", "out_of_scope"]
+
+[customer]
+frame = "TrustCustomer"
+id = "CUS-5002"
+onboarding_date = 2018-02-02
+expected_monthly_turnover = 80000
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "consistent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-5002"
+owner = "CUS-5002"
+opened_date = 2018-02-02
+balance = 310000
+last_activity_date = 2026-02-20
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-CORP"
+jurisdiction = "DM"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-IN"
+account = "ACC-5002"
+amount = 190000
+timestamp = 2026-03-03T10:00:00
+channel = "api"
+counterparty = "CP-CORP"
+
+[expected]
+disposition = "refuse_to_decide"
+reason = "out_of_scope"
+must_fire = ["IND-SCOPE-02", "POS-SCOPE-02", "POS-REASON-02"]
+notes = "A trust. Beneficial-ownership tracing is out of scope, so no verdict is offered."

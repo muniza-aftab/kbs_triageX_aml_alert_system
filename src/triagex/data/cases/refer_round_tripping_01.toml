@@ -1,0 +1,78 @@
+alert_id = "ALT-4006"
+trigger_rule = "TM-CIRCULAR"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["refer", "round_tripping", "graph"]
+
+[customer]
+frame = "BusinessCustomer"
+id = "CUS-4006"
+onboarding_date = 2023-03-15
+expected_monthly_turnover = 40000
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "present"
+declared_purpose = "inconsistent"
+adverse_media = "none"
+industry = "commodity trading"
+
+[[accounts]]
+id = "ACC-4006"
+owner = "CUS-4006"
+opened_date = 2023-03-15
+balance = 5200
+last_activity_date = 2026-02-28
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-ALPHA"
+jurisdiction = "ES"
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-BETA"
+jurisdiction = "DM"
+
+[[counterparties]]
+frame = "KnownCounterparty"
+id = "CP-GAMMA"
+jurisdiction = "CO"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-IN"
+account = "ACC-4006"
+amount = 96000
+timestamp = 2026-03-02T09:00:00
+channel = "api"
+counterparty = "CP-ALPHA"
+
+[[transactions]]
+frame = "OutboundTransfer"
+id = "T-OUT"
+account = "ACC-4006"
+amount = 94000
+timestamp = 2026-03-02T16:00:00
+channel = "api"
+counterparty = "CP-BETA"
+
+# Correspondent data showing the money finding its way home. These edges are what make the
+# graph capable of containing a cycle at all.
+[[flows]]
+source = "CP-BETA"
+target = "CP-GAMMA"
+amount = 93000
+reference = "onward settlement"
+
+[[flows]]
+source = "CP-GAMMA"
+target = "CP-ALPHA"
+amount = 92000
+reference = "closing leg"
+
+[expected]
+disposition = "refer_to_investigation"
+must_fire = ["IND-LOOP-01", "TYP-ROUND-01", "TYP-ROUND-02"]
+notes = """Value leaves the account and returns to its origin through two intermediaries. The
+round-trip indicator is computed by cycle detection over the transaction graph, not declared
+in this file - before the network search existed, closed_value_loop was a hand-set boolean and
+this case could not have been written honestly."""

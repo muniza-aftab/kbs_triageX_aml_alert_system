@@ -1,0 +1,108 @@
+alert_id = "ALT-3003"
+trigger_rule = "TM-PAYER-COUNT"
+window = { start = 2026-03-01, end = 2026-03-07 }
+tags = ["request_evidence", "mule"]
+
+[customer]
+frame = "RetailCustomer"
+id = "CUS-3003"
+onboarding_date = 2026-02-20
+expected_monthly_turnover = 1500
+kyc_status = "complete"
+sanctions_signal = "none"
+source_of_funds_evidence = "absent"
+declared_purpose = "absent"
+adverse_media = "none"
+
+[[accounts]]
+id = "ACC-3003"
+owner = "CUS-3003"
+opened_date = 2026-02-20
+balance = 120
+last_activity_date = 2026-02-28
+
+[[counterparties]]
+id = "CP-P1"
+jurisdiction = "AL"
+[[counterparties]]
+id = "CP-P2"
+jurisdiction = "AL"
+[[counterparties]]
+id = "CP-P3"
+jurisdiction = "BR"
+[[counterparties]]
+id = "CP-P4"
+jurisdiction = "AL"
+[[counterparties]]
+id = "CP-P5"
+jurisdiction = "CO"
+[[counterparties]]
+id = "CP-P6"
+jurisdiction = "AL"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-A"
+account = "ACC-3003"
+amount = 780
+timestamp = 2026-03-01T09:00:00
+channel = "api"
+counterparty = "CP-P1"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-B"
+account = "ACC-3003"
+amount = 640
+timestamp = 2026-03-01T13:00:00
+channel = "api"
+counterparty = "CP-P2"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-C"
+account = "ACC-3003"
+amount = 910
+timestamp = 2026-03-02T10:00:00
+channel = "mobile"
+counterparty = "CP-P3"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-D"
+account = "ACC-3003"
+amount = 725
+timestamp = 2026-03-03T11:00:00
+channel = "api"
+counterparty = "CP-P4"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-E"
+account = "ACC-3003"
+amount = 880
+timestamp = 2026-03-04T15:00:00
+channel = "api"
+counterparty = "CP-P5"
+
+[[transactions]]
+frame = "InboundTransfer"
+id = "T-F"
+account = "ACC-3003"
+amount = 690
+timestamp = 2026-03-05T16:00:00
+channel = "api"
+counterparty = "CP-P6"
+
+[[transactions]]
+frame = "OutboundTransfer"
+id = "T-OUT"
+account = "ACC-3003"
+amount = 4300
+timestamp = 2026-03-05T18:00:00
+channel = "api"
+
+[expected]
+disposition = "request_evidence"
+must_fire = ["IND-THIRD-01", "IND-ACCT-01"]
+notes = "Six unrelated payers into a three-week-old account, passed straight out again."

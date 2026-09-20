@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Generated output. Both are reproducible from a seed, so they are artefacts rather than
+# source: `python experiments/evaluate.py` and `triagex dossier all` regenerate them.
+results/
+
+# The coursework brief this directory originally held. Unrelated to the project, and not
+# redistributable.
+*.pdf
+COM6008*.pdf
+
+# Development plan. Useful while building, and reads oddly in a finished repository.
+PLAN.md
+
+# A separate project that was placed here for reference. Not part of this codebase.
+kbs-ai-governance-es-main/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

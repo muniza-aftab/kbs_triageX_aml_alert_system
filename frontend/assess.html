@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assess an alert | TriageX</title>
+<meta name="description" content="Enter the facts of a money-laundering alert and see the recommended action with full reasoning.">
+<link rel="stylesheet" href="/static/css/main.css">
+<script src="/config.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<header class="masthead">
+  <div class="masthead__inner">
+    <a class="masthead__title" href="/">TriageX</a>
+    <span class="masthead__strapline">Intelligent AML Alert Triage &amp; Risk Prioritization</span>
+  </div>
+</header>
+
+<nav class="primary" aria-label="Sections">
+  <ul>
+    <li><a href="/">Overview</a></li>
+    <li><a href="/assess.html">Assess an alert</a></li>
+    <li><a href="/cases.html">Worked examples</a></li>
+    <li><a href="/about.html">How it works</a></li>
+  </ul>
+</nav>
+
+<div class="notice">
+  <p><strong>Demonstration system.</strong> Do not enter real customer information. All
+  thresholds and country ratings in this system are invented.</p>
+</div>
+
+<main id="main">
+  <div id="result" hidden></div>
+
+  <div id="intro">
+    <h1>Assess an alert</h1>
+    <p class="lede">Answer as much as you can. Every question has a sensible starting value, so
+    you can change only the parts that matter and see what happens.</p>
+
+    <div class="panel">
+      <h3>One question matters more than the others</h3>
+      <p>If sanctions screening has not been run, say so. The system will decline to decide
+      rather than assume a clean result, which is the behaviour it was built for, and the
+      quickest way to see it work.</p>
+    </div>
+  </div>
+
+  <form id="form" novalidate>
+    <div id="fields">
+      <p class="loading">Loading the questions…</p>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="button" id="submit">Assess this alert</button>
+      <button type="reset" class="button button--secondary" id="reset">Start again</button>
+    </div>
+  </form>
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <p>Answers are assessed by the same rule base used by the command-line tool and the worked
+    examples. Nothing you enter is stored.</p>
+    <p><a href="/about.html">How it works</a> · <a href="/cases.html">Worked examples</a></p>
+  </div>
+</footer>
+
+<script type="module">
+import { api, el, clear, showError, loading, renderResult } from "/static/js/app.js";
+
+const fieldsBox = document.getElementById("fields");
+const form = document.getElementById("form");
+const resultBox = document.getElementById("result");
+const intro = document.getElementById("intro");
+const submit = document.getElementById("submit");
+
+function renderField(field) {
+  const id = `f-${field.name}`;
+  const wrapper = el("div", { class: "field" });
+  wrapper.append(el("label", { for: id, text: field.label }));
+  if (field.help) wrapper.append(el("span", { class: "hint", id: `${id}-hint`, text: field.help }));
+
+  if (field.kind === "number") {
+    wrapper.append(
+      el("input", {
+        type: "number",
+        id,
+        name: field.name,
+        value: field.default,
+        min: "0",
+        step: "any",
+        "aria-describedby": field.help ? `${id}-hint` : null,
+      }));
+  } else {
+    const select = el("select", {
+      id,
+      name: field.name,
+      "aria-describedby": field.help ? `${id}-hint` : null,
+    });
+    for (const choice of field.choices) {
+      const option = el("option", { value: choice.value, text: choice.label });
+      if (choice.value === field.default) option.setAttribute("selected", "selected");
+      select.append(option);
+    }
+    wrapper.append(select);
+  }
+  return wrapper;
+}
+
+try {
+  const schema = await api("/form");
+  clear(fieldsBox);
+  for (const group of schema.groups) {
+    const fieldset = el("fieldset", {}, [el("legend", { text: group.name })]);
+    for (const field of group.fields) fieldset.append(renderField(field));
+    fieldsBox.append(fieldset);
+  }
+} catch (error) {
+  showError(fieldsBox, error.message);
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const answers = {};
+  for (const [key, value] of new FormData(form).entries()) answers[key] = value;
+
+  submit.disabled = true;
+  resultBox.hidden = false;
+  intro.hidden = true;
+  loading(resultBox, "Assessing…");
+  resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  try {
+    const result = await api("/assess", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers, reference: "WEB-CASE" }),
+    });
+    renderResult(resultBox, result, { heading: "Assessment" });
+    resultBox.prepend(
+      el("p", {}, [
+        el("a", { href: "#form", text: "Change an answer and assess again" }),
+      ]));
+  } catch (error) {
+    showError(resultBox, error.message);
+  } finally {
+    submit.disabled = false;
+  }
+});
+
+form.addEventListener("reset", () => {
+  resultBox.hidden = true;
+  intro.hidden = false;
+  clear(resultBox);
+});
+</script>
+</body>
+</html>

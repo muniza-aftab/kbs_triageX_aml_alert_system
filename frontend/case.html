@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alert detail | TriageX</title>
+<meta name="description" content="Full assessment of one money-laundering alert, with reasoning and the alternatives the system ruled out.">
+<link rel="stylesheet" href="/static/css/main.css">
+<script src="/config.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<header class="masthead">
+  <div class="masthead__inner">
+    <a class="masthead__title" href="/">TriageX</a>
+    <span class="masthead__strapline">Intelligent AML Alert Triage &amp; Risk Prioritization</span>
+  </div>
+</header>
+
+<nav class="primary" aria-label="Sections">
+  <ul>
+    <li><a href="/">Overview</a></li>
+    <li><a href="/assess.html">Assess an alert</a></li>
+    <li><a href="/cases.html">Worked examples</a></li>
+    <li><a href="/about.html">How it works</a></li>
+  </ul>
+</nav>
+
+<div class="notice">
+  <p><strong>Demonstration system.</strong> This alert is invented, as are the thresholds and
+  country ratings used to assess it.</p>
+</div>
+
+<main id="main">
+  <p><a href="/cases.html">Back to worked examples</a></p>
+  <div id="detail">
+    <p class="loading">Loading alert…</p>
+  </div>
+  <div id="notes"></div>
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <p>Every conclusion above can be traced back to the facts of the case and the rules that
+    used them. Nothing is inferred by a model that cannot show its working.</p>
+    <p><a href="/cases.html">All examples</a> · <a href="/about.html">How it works</a></p>
+  </div>
+</footer>
+
+<script type="module">
+import { api, el, clear, showError, renderResult } from "/static/js/app.js";
+
+const detail = document.getElementById("detail");
+const notes = document.getElementById("notes");
+const id = new URLSearchParams(window.location.search).get("id");
+
+if (!id) {
+  showError(detail, "No alert reference was given.");
+} else {
+  document.title = `${id} | TriageX`;
+  try {
+    const result = await api(`/cases/${encodeURIComponent(id)}`);
+    renderResult(detail, result, { heading: `Alert ${result.alert}` });
+
+    if (result.notes) {
+      clear(notes);
+      notes.append(
+        el("div", { class: "panel panel--plain" }, [
+          el("h2", { text: "Why this example exists" }),
+          el("p", { text: result.notes }),
+        ]));
+    }
+  } catch (error) {
+    showError(detail, error.message);
+  }
+}
+</script>
+</body>
+</html>
