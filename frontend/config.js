@@ -11,4 +11,4 @@
  * This is deliberately a plain file rather than a build-time variable. The site has no build
  * step, and one line to edit is a smaller cost than introducing a bundler to avoid editing it.
  */
-window.TRIAGEX_API_BASE = "";
+window.TRIAGEX_API_BASE = "https://triagex-api.onrender.com";
