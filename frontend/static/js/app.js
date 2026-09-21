@@ -191,7 +191,8 @@ export function renderAlternatives(result) {
     el("h2", { text: "Why not something else" }),
     el("p", {
       text: "Every other decision the system could have reached, and what stopped it.",
-    })...blocks,
+    }),
+    ...blocks,
   ]);
 }
 

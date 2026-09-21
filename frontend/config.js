@@ -11,4 +11,12 @@
  * This is deliberately a plain file rather than a build-time variable. The site has no build
  * step, and one line to edit is a smaller cost than introducing a bundler to avoid editing it.
  */
-window.TRIAGEX_API_BASE = "https://triagex-api.onrender.com";
+(function () {
+  // Served locally by uvicorn, the API is on the same origin, so no base is needed. Anywhere
+  // else the page is the Vercel deployment and the API is the Render service. Deciding here
+  // rather than by hand means the same file is correct in both places and cannot be committed
+  // in the wrong state.
+  var host = window.location.hostname;
+  var local = host === "localhost" || host === "127.0.0.1" || host === "[::1]";
+  window.TRIAGEX_API_BASE = local ? "" : "https://triagex-api.onrender.com";
+})();

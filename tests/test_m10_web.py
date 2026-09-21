@@ -15,6 +15,9 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -429,3 +432,32 @@ def test_requirements_only_cover_the_web_layer() -> None:
     # The core must stay dependency-free; nothing here may creep into it.
     assert "networkx" not in text
     assert "matplotlib" not in text
+
+
+def test_every_script_parses() -> None:
+    """A syntax error in a module stops the whole page silently.
+
+    The browser refuses to run the file, so nothing replaces the loading placeholders and no
+    error handler ever fires, which is exactly how a broken spread in app.js once left every page
+    stuck on "Loading..." while each file was still served with a 200. Serving checks cannot see
+    this; only parsing can. Skipped where Node is not installed.
+    """
+    node = shutil.which("node")
+    if node is None:
+        pytest.skip("node is not installed")
+
+    scripts: list[tuple[str, str]] = [
+        ("static/js/app.js", (WEB / "static/js/app.js").read_text(encoding="utf-8")),
+        ("config.js", (WEB / "config.js").read_text(encoding="utf-8")),
+    ]
+    for page in PAGES:
+        html = (WEB / page).read_text(encoding="utf-8")
+        for i, body in enumerate(re.findall(r'<script type="module">(.*?)</script>', html, re.S)):
+            scripts.append((f"{page} inline script {i}", body))
+
+    with tempfile.TemporaryDirectory() as tmp:
+        for name, source in scripts:
+            path = Path(tmp) / "check.mjs"
+            path.write_text(source, encoding="utf-8")
+            result = subprocess.run([node, "--check", str(path)], capture_output=True, text=True)
+            assert result.returncode == 0, f"{name} does not parse:\n{result.stderr}"
