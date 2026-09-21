@@ -79,18 +79,27 @@ and thresholds costs **3.498** and misses **21 referrals against 2**.
 
 ## The website
 
-A plain HTML, CSS and JavaScript front end in [`frontend/`](frontend/), no framework, no build
-step, written for the person who has to act on a decision rather than for an engineer. It renders the same assessments the CLI
-produces, It talks to the API in [`backend/`](backend/) and renders through a [plain-language layer](src/triagex/plain.py) that translates
-`typology_support(strong)` into "Pattern strength: Strong" without ever dressing a certainty factor
-up as a percentage.
+A plain HTML, CSS and JavaScript front end in [`frontend/`](frontend/): no framework, no build
+step, and no third-party requests, with fonts served from the site itself. It is written for the
+person who has to act on a decision rather than for an engineer. It talks to the API in
+[`backend/`](backend/), which renders through a [plain-language layer](src/triagex/plain.py) that
+translates `typology_support(strong)` into "Pattern strength: Strong" without ever dressing a
+certainty factor up as a percentage.
 
 | page | what it does |
 |---|---|
-| Overview | What the system does and why declining is a feature |
-| Assess an alert | A form of plain-English questions; live assessment with full reasoning |
-| Worked examples | All 24 cases, filterable by outcome, each with its own detail page |
-| How it works | The staged reasoning, the sources, and the limitations |
+| Home | What the system does, the five decisions, and why declining is a feature |
+| Run assessment | A guided four-step form with validation, then a review step and a live assessment |
+| Examples | All 24 cases, filterable by outcome and searchable, each with its own result page |
+| History | Every assessment from this session, kept in the browser, reopenable and exportable |
+| About | The staged reasoning, live rule and fact counts, sources, limitations and terms |
+
+Every result, whether a new assessment, a worked example or a history entry, is shown in the same
+dashboard: the recommended action, a plain-language explanation, the intermediate assessment, the
+patterns detected, the reasoning trace grouped by stage, why each other decision was ruled out, and
+the rules that fired. Any result, or a whole session, can be downloaded as a self-contained HTML
+report, saved as a PDF, or exported as JSON. Light and dark themes follow the system setting and can
+be switched by hand.
 
 ```bash
 pip install -e ".[web]"
@@ -107,23 +116,19 @@ backend/    the ASGI API           ->  Render
 ```
 
 **Vercel, the front end.** Set the project's root to the repository and Vercel reads
-[`vercel.json`](vercel.json): no build step, `frontend/` is served as-is, with cache headers on the
-static assets and `X-Frame-Options`, `nosniff` and a referrer policy on everything.
+[`vercel.json`](vercel.json): no build step, `frontend/` is served as-is, with long-lived caching for the
+fonts only and `X-Frame-Options`, `nosniff` and a referrer policy on everything.
 [`.vercelignore`](.vercelignore) keeps the Python out of the deployment entirely.
 
 **Render, the API.** [`render.yaml`](render.yaml) is a blueprint. Render installs the package,
 runs `uvicorn backend.index:app` and health-checks `/api/health`.
 
-**Then connect them.** After the first Render deploy, put its URL in
-[`frontend/config.js`](frontend/config.js):
-
-```js
-window.TRIAGEX_API_BASE = "https://your-service.onrender.com";
-```
-
-One line, no build step. Optionally set `ALLOWED_ORIGINS` on the Render service to your Vercel
-domain to close CORS down. The default is permissive because the API holds no state and exposes
-no user data, but that is not a default to keep in a system that does.
+**Then connect them.** [`frontend/config.js`](frontend/config.js) chooses the API address itself:
+same origin when the site is served locally, the Render service everywhere else. If the Render
+service is not called `triagex-api`, change the one URL in that file. Optionally set
+`ALLOWED_ORIGINS` on the Render service to your Vercel domain to close CORS down. The default is
+permissive because the API holds no state and exposes no user data, but that is not a default to
+keep in a system that does.
 
 The Render free tier sleeps when idle, so the first request to a cold service takes a few seconds.
 The front end says so rather than looking broken.

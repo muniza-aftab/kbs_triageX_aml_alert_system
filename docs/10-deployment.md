@@ -23,7 +23,7 @@ CORS, so one of the two has to go first and be amended afterwards.
 
 1. Push the repository to GitHub.
 2. Deploy the API to Render. Note its URL.
-3. Put that URL in `frontend/config.js` and push.
+3. If the service is not named `triagex-api`, put its URL in `frontend/config.js` and push.
 4. Deploy the front end to Vercel. Note its domain.
 5. Set `ALLOWED_ORIGINS` on Render to that domain.
 
@@ -66,9 +66,11 @@ files do reach the build machine and are then discarded before the build runs. T
 not prevent framework detection, which happened once at import time and is now a stored project
 setting rather than something re-derived from the files on each build.
 
-Cache headers are set per path. Fingerprinted static assets are immutable for a year. `config.js`
-is explicitly `no-cache`, because it is the one file whose contents change between environments and
-a stale copy would point the site at the wrong API.
+Cache headers are set per path. The fonts never change under the same name, so they are cached
+as immutable for a year. Scripts and stylesheets keep their names across releases, so they are
+revalidated on every visit instead: marking them immutable would leave returning visitors on an old
+version of the site after a deploy. `config.js` is explicitly `no-cache`, because it decides which
+API the site talks to.
 
 ## CORS
 
@@ -91,8 +93,8 @@ Four checks, in order, because each one rules out a different failure:
 3. The worked examples page lists cases. The site reached the API and CORS permitted it.
 4. Submitting the assessment form returns an outcome. The full request path works, including `POST`.
 
-If step 3 fails while step 1 passes, the cause is almost always one of two things: `config.js` still
-holds an empty string, or `ALLOWED_ORIGINS` does not match the site's origin exactly. The browser
+If step 3 fails while step 1 passes, the cause is almost always one of two things: `config.js` points at
+the wrong service, or `ALLOWED_ORIGINS` does not match the site's origin exactly. The browser
 console distinguishes them. A CORS rejection names the policy; a wrong base URL shows a request to
 the wrong host, or to the Vercel domain itself.
 
@@ -104,6 +106,5 @@ One process serves both, because `backend/index.py` mounts `frontend/` when the 
 uvicorn backend.index:app --reload --port 8000
 ```
 
-`config.js` holds an empty string, meaning same origin, so nothing needs changing to work locally.
-That mount is unused in production, where Vercel serves the static files and the directory is not
-part of the Render deploy.
+`config.js` detects `localhost` and uses the same origin, so nothing needs changing to work
+locally.

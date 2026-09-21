@@ -198,7 +198,8 @@ thing the evaluation produced.
 
 There are three ways in:
 
-- **The website**: assess an alert through a form, or browse 24 worked examples.
+- **The website**: assess an alert through a guided form, browse 24 worked examples, keep a
+  session history, and download any result as a report, a PDF or JSON.
   See [the deployment notes](../README.md#deploying-the-website).
 - **The command line**: `triagex run ALT-3001 --explain`.
 - **The written record**: [the refinement log](refinement-log.md) lists every change made to the

@@ -3,159 +3,703 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Assess an alert | TriageX</title>
-<meta name="description" content="Enter the facts of a money-laundering alert and see the recommended action with full reasoning.">
+<title>Run an assessment | TriageX</title>
+<meta name="description" content="Describe an alert in four short steps and TriageX will recommend what to do with it, with its full reasoning.">
+<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c0f13" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/static/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/source-serif-4-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/static/css/main.css">
+<script src="/static/js/theme.js"></script>
 <script src="/config.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to main content</a>
 
-<header class="masthead">
-  <div class="masthead__inner">
-    <a class="masthead__title" href="/">TriageX</a>
-    <span class="masthead__strapline">Intelligent AML Alert Triage &amp; Risk Prioritization</span>
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href="/" aria-label="TriageX, home">
+      <span class="brand__mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14"/><path d="M5 12h9"/><path d="M5 17h4"/></svg></span>
+      <span class="brand__name">Triage<span>X</span></span>
+    </a>
+    <nav aria-label="Primary">
+      <ul class="nav" id="primary-nav">
+        <li><a href="/">Home</a></li>
+        <li><a href="/assess.html">Run assessment</a></li>
+        <li><a href="/cases.html">Examples</a></li>
+        <li><a href="/history.html">History <span class="nav__count" data-history-count hidden>0</span></a></li>
+        <li><a href="/about.html">About</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-toggle" type="button" aria-label="Switch theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.9 4.9 1.4 1.4"/><path d="m17.7 17.7 1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.3 17.7-1.4 1.4"/><path d="m19.1 4.9-1.4 1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+        <span class="theme-toggle__thumb" aria-hidden="true"></span>
+      </button>
+      <button class="menu-button" type="button" aria-label="Menu" aria-expanded="false" aria-controls="primary-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg></button>
+    </div>
   </div>
 </header>
 
-<nav class="primary" aria-label="Sections">
-  <ul>
-    <li><a href="/">Overview</a></li>
-    <li><a href="/assess.html">Assess an alert</a></li>
-    <li><a href="/cases.html">Worked examples</a></li>
-    <li><a href="/about.html">How it works</a></li>
-  </ul>
-</nav>
-
 <div class="notice">
-  <p><strong>Demonstration system.</strong> Do not enter real customer information. All
-  thresholds and country ratings in this system are invented.</p>
+  <div class="container">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <p><strong>Demonstration system.</strong> Built on invented data. Nothing on this site may be used to make a decision about a real person.</p>
+  </div>
 </div>
 
 <main id="main">
-  <div id="result" hidden></div>
-
-  <div id="intro">
-    <h1>Assess an alert</h1>
-    <p class="lede">Answer as much as you can. Every question has a sensible starting value, so
-    you can change only the parts that matter and see what happens.</p>
-
-    <div class="panel">
-      <h3>One question matters more than the others</h3>
-      <p>If sanctions screening has not been run, say so. The system will decline to decide
-      rather than assume a clean result, which is the behaviour it was built for, and the
-      quickest way to see it work.</p>
+<div class="container">
+  <div class="page-head" id="page-head">
+    <span class="eyebrow">Run an assessment</span>
+    <h1>Describe the alert</h1>
+    <p class="lede">Answer as much as you can. Every question starts at a sensible value, so you
+    can change only the parts that matter and see what happens.</p>
+    <div class="callout ask" style="max-width: 760px; margin-top: 6px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      <p><strong>One question matters more than the others.</strong> If sanctions screening has
+      not been run, say so. The system will decline to decide rather than assume a clean result,
+      which is the behaviour it was built for, and the quickest way to see it work.</p>
     </div>
   </div>
-
-  <form id="form" novalidate>
-    <div id="fields">
-      <p class="loading">Loading the questions…</p>
-    </div>
-
-    <div class="actions">
-      <button type="submit" class="button" id="submit">Assess this alert</button>
-      <button type="reset" class="button button--secondary" id="reset">Start again</button>
-    </div>
-  </form>
+  <div id="app" aria-live="polite">
+    <p class="loading">Loading the questions&hellip;</p>
+  </div>
+</div>
 </main>
 
-<footer class="site">
-  <div class="inner">
-    <p>Answers are assessed by the same rule base used by the command-line tool and the worked
-    examples. Nothing you enter is stored.</p>
-    <p><a href="/about.html">How it works</a> · <a href="/cases.html">Worked examples</a></p>
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__about">
+        <a class="brand" href="/" aria-label="TriageX, home">
+          <span class="brand__mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14"/><path d="M5 12h9"/><path d="M5 17h4"/></svg></span>
+          <span class="brand__name">Triage<span>X</span></span>
+        </a>
+        <p>Intelligent AML alert triage and risk prioritisation. A knowledge-based system that
+        recommends what to do with an alert, shows exactly why, and declines to decide when it
+        cannot justify a decision.</p>
+      </div>
+      <div>
+        <h2>Explore</h2>
+        <ul>
+          <li><a href="/assess.html">Run an assessment</a></li>
+          <li><a href="/cases.html">Worked examples</a></li>
+          <li><a href="/history.html">Session history</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Reference</h2>
+        <ul>
+          <li><a href="/about.html">How it works</a></li>
+          <li><a href="/about.html#limitations">Limitations</a></li>
+          <li><a href="/about.html#terms">Terms of use</a></li>
+          <li><a href="/api/docs" data-api-docs>API reference</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__base">
+      <span>&copy; <span data-year>2026</span> Muniza Aftab. Released under the MIT licence.</span>
+      <span>All data is synthetic. Rules are derived from published UK and international guidance.</span>
+    </div>
   </div>
 </footer>
 
 <script type="module">
-import { api, el, clear, showError, loading, renderResult } from "/static/js/app.js";
+import {
+  api, el, clear, icon, showError, toast, session, observeReveal,
+} from "/static/js/app.js";
+import { renderResult } from "/static/js/results.js";
+import { LAYERS } from "/static/js/knowledge.js";
 
-const fieldsBox = document.getElementById("fields");
-const form = document.getElementById("form");
-const resultBox = document.getElementById("result");
-const intro = document.getElementById("intro");
-const submit = document.getElementById("submit");
+const app = document.getElementById("app");
+const pageHead = document.getElementById("page-head");
+const DRAFT_KEY = "triagex.draft.v1";
+
+/* Short titles and descriptions for each group of questions, keyed by the group name the API
+   sends. Anything not listed still works, it just uses the group name as its title. */
+const GROUP_META = {
+  "About the customer": { short: "Customer", text: "Who the customer is, and what they told the bank to expect." },
+  "Checks carried out": { short: "Checks", text: "Which due-diligence checks have been done, and what they found." },
+  "The activity": { short: "Activity", text: "What actually happened in the account during the alert period." },
+  "Account and counterparties": { short: "Account", text: "The account's history, and the people and places the money touched." },
+};
+
+const KEY_QUESTION = "sanctions_signal";
+
+let schema = null;
+let steps = [];
+let answers = {};
+let current = 0;
+let furthest = 0;
+let reference = "";
+
+/* ---------------------------------------------------------------- state */
+
+function defaults() {
+  const values = {};
+  for (const group of schema.groups) for (const field of group.fields) values[field.name] = String(field.default);
+  return values;
+}
+
+function fieldByName(name) {
+  for (const group of schema.groups) for (const field of group.fields) if (field.name === name) return field;
+  return null;
+}
+
+function saveDraft() {
+  session.set(DRAFT_KEY, { answers, current, furthest, reference });
+}
+
+function isMoney(field) {
+  return /\(GBP\)/.test(field.label) || /turnover|credit/.test(field.name) && !/count/.test(field.name);
+}
+
+function isInteger(field) {
+  return field.kind === "number" && !isMoney(field);
+}
+
+function unitOf(field) {
+  if (/days/.test(field.name)) return "days";
+  return "";
+}
+
+function display(field, value) {
+  if (field.kind === "choice") {
+    const choice = (field.choices || []).find((c) => String(c.value) === String(value));
+    return choice ? choice.label : String(value);
+  }
+  if (value === "" || value === undefined) return "Not given";
+  const number = Number(value);
+  if (isMoney(field) && Number.isFinite(number)) {
+    return `£${number.toLocaleString("en-GB", { maximumFractionDigits: 2 })}`;
+  }
+  const unit = unitOf(field);
+  return unit ? `${value} ${unit}` : String(value);
+}
+
+function edited(field) {
+  return String(answers[field.name]) !== String(field.default);
+}
+
+/* ---------------------------------------------------------------- validation */
+
+function validateField(field) {
+  if (field.kind !== "number") return "";
+  const raw = String(answers[field.name] ?? "").trim();
+  if (raw === "") return "Enter a number. The starting value was " + field.default + ".";
+  const number = Number(raw);
+  if (!Number.isFinite(number)) return "This needs to be a number.";
+  if (number < 0) return "This cannot be negative.";
+  if (isInteger(field) && !Number.isInteger(number)) return "This needs to be a whole number.";
+  return "";
+}
+
+/* ---------------------------------------------------------------- field rendering */
 
 function renderField(field) {
-  const id = `f-${field.name}`;
-  const wrapper = el("div", { class: "field" });
-  wrapper.append(el("label", { for: id, text: field.label }));
-  if (field.help) wrapper.append(el("span", { class: "hint", id: `${id}-hint`, text: field.help }));
+  const labelId = `${field.name}-label`;
+  const helpId = `${field.name}-help`;
+  const errorId = `${field.name}-error`;
+  const editedFlag = el("span", { class: "field__flag field__flag--edited", text: "Edited", hidden: !edited(field) });
 
-  if (field.kind === "number") {
-    wrapper.append(
-      el("input", {
-        type: "number",
-        id,
-        name: field.name,
-        value: field.default,
-        min: "0",
-        step: "any",
-        "aria-describedby": field.help ? `${id}-hint` : null,
-      }));
+  const head = el("div", { class: "field__head" }, [
+    field.kind === "number"
+      ? el("label", { class: "field__label", id: labelId, for: field.name, text: field.label })
+      : el("span", { class: "field__label", id: labelId, text: field.label }),
+    field.name === KEY_QUESTION ? el("span", { class: "field__flag field__flag--key", text: "Most important question" }) : null,
+    editedFlag,
+  ]);
+
+  const error = el("p", { class: "field__error", id: errorId, hidden: true }, [icon("alert"), el("span")]);
+  const setError = (message) => {
+    error.hidden = !message;
+    error.lastChild.textContent = message;
+  };
+
+  const onChange = (value) => {
+    answers[field.name] = value;
+    editedFlag.hidden = !edited(field);
+    saveDraft();
+  };
+
+  let control;
+  if (field.kind === "choice") {
+    const choices = field.choices || [];
+    control = el("div", {
+      class: `options ${choices.length === 2 ? "options--two" : ""}`,
+      role: "radiogroup",
+      "aria-labelledby": labelId,
+      "aria-describedby": helpId,
+    }, choices.map((choice) => {
+      const id = `${field.name}--${choice.value}`;
+      return el("div", { class: "option" }, [
+        el("input", {
+          type: "radio",
+          id,
+          name: field.name,
+          value: String(choice.value),
+          checked: String(answers[field.name]) === String(choice.value),
+          onchange: (event) => onChange(event.target.value),
+        }),
+        el("label", { for: id, text: choice.label }),
+      ]);
+    }));
   } else {
-    const select = el("select", {
-      id,
+    const money = isMoney(field);
+    const unit = unitOf(field);
+    const input = el("input", {
+      class: "input",
+      id: field.name,
       name: field.name,
-      "aria-describedby": field.help ? `${id}-hint` : null,
+      type: "text",
+      inputmode: isInteger(field) ? "numeric" : "decimal",
+      autocomplete: "off",
+      value: answers[field.name],
+      "aria-describedby": `${helpId} ${errorId}`,
+      oninput: (event) => {
+        onChange(event.target.value);
+        if (input.getAttribute("aria-invalid") === "true") {
+          const message = validateField(field);
+          setError(message);
+          if (!message) input.removeAttribute("aria-invalid");
+        }
+      },
+      onblur: () => {
+        const message = validateField(field);
+        setError(message);
+        if (message) input.setAttribute("aria-invalid", "true");
+      },
+      onkeydown: (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          goNext();
+        }
+      },
     });
-    for (const choice of field.choices) {
-      const option = el("option", { value: choice.value, text: choice.label });
-      if (choice.value === field.default) option.setAttribute("selected", "selected");
-      select.append(option);
+    control = el("div", {
+      class: `input-wrap ${money ? "input-wrap--prefix" : ""} ${unit ? "input-wrap--suffix" : ""}`,
+    }, [
+      money ? el("span", { class: "input-wrap__prefix", text: "£" }) : null,
+      input,
+      unit ? el("span", { class: "input-wrap__suffix", text: unit }) : null,
+    ]);
+  }
+
+  const node = el("div", { class: "field", dataset: { field: field.name } }, [
+    head,
+    field.help ? el("p", { class: "field__help", id: helpId, text: field.help }) : null,
+    control,
+    error,
+  ]);
+  node.setError = setError;
+  return node;
+}
+
+/* ---------------------------------------------------------------- the wizard */
+
+let wizardRoot;
+let stepperList;
+let progressBar;
+let progressLabel;
+let panelHost;
+
+function buildWizard() {
+  steps = schema.groups.map((group, index) => ({
+    kind: "group",
+    group,
+    title: group.name,
+    short: (GROUP_META[group.name] || {}).short || group.name,
+    text: (GROUP_META[group.name] || {}).text || "",
+    index,
+  }));
+  steps.push({ kind: "review", title: "Review and assess", short: "Review", text: "Check your answers, then run the assessment." });
+
+  clear(app);
+  progressBar = el("div", { class: "progress__bar" });
+  progressLabel = el("span");
+  stepperList = el("ol", { class: "steps" });
+
+  wizardRoot = el("div", { class: "wizard" }, [
+    el("aside", { class: "stepper", "aria-label": "Progress" }, [
+      el("div", { class: "stepper__progress" }, [
+        el("div", { class: "stepper__progress-label" }, [progressLabel, el("span", { text: `${steps.length} steps` })]),
+        el("div", { class: "progress", role: "presentation" }, [progressBar]),
+      ]),
+      stepperList,
+    ]),
+    panelHost = el("div", { class: "card" }),
+  ]);
+  app.append(wizardRoot);
+  showStep(current, false);
+}
+
+function renderStepper() {
+  clear(stepperList);
+  steps.forEach((step, index) => {
+    const done = index < current || (index <= furthest && index !== current && index < steps.length - 1);
+    const reachable = index <= furthest;
+    const button = el("button", {
+      class: `step-link ${done ? "is-done" : ""}`,
+      type: "button",
+      disabled: !reachable,
+      "aria-current": index === current ? "step" : null,
+      onclick: () => {
+        if (index === current) return;
+        if (index > current && !validateStep(current)) return;
+        showStep(index);
+      },
+    }, [
+      el("span", { class: "step-link__num" }, [done ? icon("check") : String(index + 1)]),
+      el("span", { class: "step-link__text" }, [
+        el("span", { class: "step-link__title", text: step.short }),
+        el("span", { class: "step-link__sub", text: step.kind === "review" ? "Check and run" : `${step.group.fields.length} questions` }),
+      ]),
+    ]);
+    stepperList.append(el("li", {}, [button]));
+  });
+  const fraction = current / (steps.length - 1);
+  progressBar.style.width = `${Math.round(fraction * 100)}%`;
+  progressLabel.textContent = `Step ${current + 1} of ${steps.length}`;
+}
+
+function validateStep(index) {
+  const step = steps[index];
+  if (step.kind !== "group") return true;
+  let first = null;
+  for (const node of panelHost.querySelectorAll("[data-field]")) {
+    const field = fieldByName(node.dataset.field);
+    const message = validateField(field);
+    node.setError(message);
+    const input = node.querySelector("input.input");
+    if (input) {
+      if (message) input.setAttribute("aria-invalid", "true");
+      else input.removeAttribute("aria-invalid");
     }
-    wrapper.append(select);
+    if (message && !first) first = input || node;
   }
-  return wrapper;
+  if (first) {
+    first.focus();
+    first.scrollIntoView({ behavior: "smooth", block: "center" });
+    return false;
+  }
+  return true;
 }
 
-try {
-  const schema = await api("/form");
-  clear(fieldsBox);
+function goNext() {
+  if (!validateStep(current)) return;
+  if (current < steps.length - 1) showStep(current + 1);
+}
+
+function showStep(index, focus = true) {
+  current = index;
+  furthest = Math.max(furthest, index);
+  saveDraft();
+  renderStepper();
+
+  const step = steps[index];
+  const heading = el("h2", { tabindex: "-1", text: step.title });
+  const panel = el("div", { class: "step-panel" }, [
+    el("div", { class: "step-panel__head" }, [
+      el("span", { class: "step-panel__count", text: `Step ${index + 1} of ${steps.length}` }),
+      heading,
+      step.text ? el("p", { text: step.text }) : null,
+    ]),
+  ]);
+
+  if (step.kind === "group") {
+    panel.append(el("div", {}, step.group.fields.map(renderField)));
+  } else {
+    panel.append(renderReview());
+  }
+
+  const nav = el("div", { class: "wizard-nav" }, [
+    index > 0
+      ? el("button", { class: "button button--secondary", type: "button", onclick: () => showStep(index - 1) }, [
+          icon("arrowLeft", "arrow-start"), "Back",
+        ])
+      : el("button", { class: "button button--ghost", type: "button", onclick: resetAll }, [icon("refresh"), "Reset answers"]),
+    el("span", { class: "spacer" }),
+    step.kind === "group"
+      ? el("button", { class: "button", type: "button", onclick: goNext }, [
+          index === steps.length - 2 ? "Review answers" : `Next: ${steps[index + 1].short}`,
+          icon("arrowRight", "arrow-end"),
+        ])
+      : el("button", { class: "button button--lg", type: "button", onclick: runAssessment }, [
+          "Run assessment", icon("arrowRight", "arrow-end"),
+        ]),
+  ]);
+  panel.append(nav);
+
+  clear(panelHost);
+  panelHost.append(panel);
+
+  if (focus) {
+    heading.focus({ preventScroll: true });
+    const top = app.getBoundingClientRect().top + window.scrollY - 90;
+    if (window.scrollY > top) window.scrollTo({ top, behavior: "smooth" });
+  }
+}
+
+function renderReview() {
+  const wrap = el("div");
+  schema.groups.forEach((group, index) => {
+    const changed = group.fields.filter(edited).length;
+    wrap.append(
+      el("div", { class: "review-group" }, [
+        el("div", { class: "review-group__head" }, [
+          el("h3", {}, [
+            group.name,
+            el("span", { class: "muted small", style: "font-weight: 500; margin-left: 8px", text: changed ? `${changed} edited` : "all at starting values" }),
+          ]),
+          el("button", { class: "button button--ghost button--sm", type: "button", onclick: () => showStep(index) }, [icon("edit"), "Edit"]),
+        ]),
+        el("dl", { class: "review-list" }, group.fields.map((field) =>
+          el("div", { class: edited(field) ? "is-edited" : "" }, [
+            el("dt", { text: field.label }),
+            el("dd", { text: display(field, answers[field.name]) }),
+          ]))),
+      ]));
+  });
+
+  const refInput = el("input", {
+    class: "input",
+    id: "reference",
+    type: "text",
+    maxlength: "40",
+    autocomplete: "off",
+    placeholder: "e.g. ALERT-2291",
+    value: reference,
+    "aria-describedby": "reference-help",
+    oninput: (event) => {
+      reference = event.target.value;
+      saveDraft();
+    },
+  });
+  wrap.append(
+    el("div", { class: "field", style: "margin-top: 8px; border-top: 1px solid var(--border); padding-top: 22px" }, [
+      el("div", { class: "field__head" }, [el("label", { class: "field__label", for: "reference", text: "Alert reference (optional)" })]),
+      el("p", { class: "field__help", id: "reference-help", text: "A label for your history and reports. Do not enter names or any real personal data." }),
+      el("div", { class: "input-wrap" }, [refInput]),
+    ]),
+    el("div", { id: "submit-error" }),
+  );
+  return wrap;
+}
+
+async function resetAll() {
+  answers = defaults();
+  reference = "";
+  furthest = 0;
+  session.remove(DRAFT_KEY);
+  showStep(0);
+  toast("Answers reset", "Every question is back at its starting value.", "refresh");
+}
+
+/* ---------------------------------------------------------------- answers for reports */
+
+function answerRecord() {
+  const rows = [];
   for (const group of schema.groups) {
-    const fieldset = el("fieldset", {}, [el("legend", { text: group.name })]);
-    for (const field of group.fields) fieldset.append(renderField(field));
-    fieldsBox.append(fieldset);
+    for (const field of group.fields) {
+      rows.push({
+        group: group.name,
+        field: field.name,
+        label: field.label,
+        value: answers[field.name],
+        display: display(field, answers[field.name]),
+        edited: edited(field),
+      });
+    }
   }
-} catch (error) {
-  showError(fieldsBox, error.message);
+  return rows;
 }
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const answers = {};
-  for (const [key, value] of new FormData(form).entries()) answers[key] = value;
+/* ---------------------------------------------------------------- processing */
 
-  submit.disabled = true;
-  resultBox.hidden = false;
-  intro.hidden = true;
-  loading(resultBox, "Assessing…");
-  resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
+const STAGE_STEP_MS = 300;
+
+function processingView(ref) {
+  const stages = LAYERS.map((layer) =>
+    el("li", { class: "processing__stage" }, [
+      el("span", { class: "processing__dot" }, [icon("check")]),
+      el("span", {}, [el("strong", { text: layer.name }), el("small", { text: ` · ${layer.sub}` })]),
+      el("span"),
+    ]));
+  const slow = el("div", { class: "processing__slow", hidden: true }, [
+    el("div", { class: "callout" }, [
+      icon("clock"),
+      el("p", {}, [
+        el("strong", { text: "Waking up the assessment service. " }),
+        "It sleeps when idle, so the first request can take up to a minute. After that it is fast.",
+      ]),
+    ]),
+  ]);
+  const view = el("div", { class: "card processing", role: "status", "aria-live": "polite" }, [
+    el("div", { class: "processing__head" }, [
+      el("div", { class: "orbit", "aria-hidden": "true" }, [el("span", { class: "orbit__core" })]),
+      el("div", {}, [
+        el("h2", { text: "Assessing the alert" }),
+        el("p", { text: `Reference ${ref}. Working up through the six stages of reasoning.` }),
+      ]),
+    ]),
+    el("ol", { class: "processing__stages" }, stages),
+    slow,
+  ]);
+  return { view, stages, slow };
+}
+
+function animateStages(stages) {
+  let index = 0;
+  let timer = null;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const advance = () => {
+    if (index > 0) {
+      stages[index - 1].classList.remove("is-active");
+      stages[index - 1].classList.add("is-done");
+    }
+    if (index < stages.length - 1) {
+      stages[index].classList.add("is-active");
+      index += 1;
+      timer = window.setTimeout(advance, reduced ? 0 : STAGE_STEP_MS);
+    } else {
+      // Hold on the final stage until the answer arrives.
+      stages[index].classList.add("is-active");
+    }
+  };
+  advance();
+  const minimum = new Promise((resolve) => window.setTimeout(resolve, reduced ? 0 : STAGE_STEP_MS * (stages.length - 1) + 250));
+  return {
+    minimum,
+    finish() {
+      window.clearTimeout(timer);
+      for (const stage of stages) {
+        stage.classList.remove("is-active");
+        stage.classList.add("is-done");
+      }
+    },
+  };
+}
+
+async function runAssessment() {
+  const ref = (reference || "").trim() || `WEB-${new Date().toISOString().slice(2, 16).replace(/[-:T]/g, "")}`;
+  const payloadAnswers = { ...answers };
+  const record = answerRecord();
+
+  const { view, stages, slow } = processingView(ref);
+  pageHead.hidden = true;
+  clear(app);
+  app.append(view);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  const run = animateStages(stages);
+  const slowTimer = window.setTimeout(() => { slow.hidden = false; }, 4500);
 
   try {
-    const result = await api("/assess", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answers, reference: "WEB-CASE" }),
-    });
-    renderResult(resultBox, result, { heading: "Assessment" });
-    resultBox.prepend(
-      el("p", {}, [
-        el("a", { href: "#form", text: "Change an answer and assess again" }),
-      ]));
-  } catch (error) {
-    showError(resultBox, error.message);
-  } finally {
-    submit.disabled = false;
-  }
-});
+    const [result] = await Promise.all([
+      api("/assess", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers: payloadAnswers, reference: ref }),
+      }, { slowNotice: false }),
+      run.minimum,
+    ]);
+    window.clearTimeout(slowTimer);
+    run.finish();
+    await new Promise((resolve) => window.setTimeout(resolve, 280));
 
-form.addEventListener("reset", () => {
-  resultBox.hidden = true;
-  intro.hidden = false;
-  clear(resultBox);
-});
+    session.remove(DRAFT_KEY);
+    clear(app);
+    const page = el("div");
+    app.append(
+      el("div", { class: "page-head", style: "padding-bottom: 12px" }, [
+        el("span", { class: "eyebrow", text: "Assessment result" }),
+        el("h1", { text: `Alert ${ref}` }),
+      ]),
+      page,
+    );
+    await renderResult(page, result, {
+      reference: ref,
+      source: "assessment",
+      answers: record,
+      autoSave: true,
+      actions: [
+        el("button", { class: "button button--ghost button--sm", type: "button", onclick: () => backToWizard(steps.length - 1) }, [
+          icon("edit"), "Adjust answers",
+        ]),
+        el("button", { class: "button button--ghost button--sm", type: "button", onclick: startNew }, [
+          icon("plus"), "New assessment",
+        ]),
+      ],
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (error) {
+    window.clearTimeout(slowTimer);
+    backToWizard(steps.length - 1);
+    const target = document.getElementById("submit-error");
+    if (target) {
+      showError(target, error.message, runAssessment);
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+}
+
+function backToWizard(step) {
+  pageHead.hidden = false;
+  clear(app);
+  app.append(wizardRoot);
+  showStep(step);
+}
+
+function startNew() {
+  answers = defaults();
+  reference = "";
+  furthest = 0;
+  current = 0;
+  session.remove(DRAFT_KEY);
+  pageHead.hidden = false;
+  clear(app);
+  app.append(wizardRoot);
+  showStep(0);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ---------------------------------------------------------------- start */
+
+async function start() {
+  clear(app);
+  app.append(el("div", { class: "wizard" }, [
+    el("div", { class: "card card--flat skeleton-card" }, [el("div", { class: "skeleton skeleton--title" })]),
+    el("div", { class: "card card--flat skeleton-card" }, [
+      el("div", { class: "skeleton skeleton--title" }),
+      el("div", { class: "skeleton skeleton--line" }),
+      el("div", { class: "skeleton skeleton--line", style: "width: 80%" }),
+    ]),
+  ]));
+  try {
+    schema = await api("/form");
+  } catch (error) {
+    showError(app, error.message, start);
+    return;
+  }
+
+  answers = defaults();
+  const draft = session.get(DRAFT_KEY);
+  if (draft && draft.answers) {
+    for (const [name, value] of Object.entries(draft.answers)) if (name in answers) answers[name] = String(value);
+    reference = draft.reference || "";
+    const last = schema.groups.length;
+    current = Math.min(Number(draft.current) || 0, last);
+    furthest = Math.min(Math.max(Number(draft.furthest) || 0, current), last);
+  }
+  buildWizard();
+  observeReveal(app);
+}
+
+start();
 </script>
+
 </body>
 </html>

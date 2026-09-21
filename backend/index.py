@@ -36,6 +36,7 @@ from pydantic import BaseModel, Field  # noqa: E402
 
 from triagex.data.loader import Case, factbase_for, load_library  # noqa: E402
 from triagex.kb.knowledge_base import KNOWLEDGE_BASE  # noqa: E402
+from triagex.kb.predicates import PREDICATES  # noqa: E402
 from triagex.pipeline import assess, assess_measurements  # noqa: E402
 from triagex.plain import (  # noqa: E402
     FormError,
@@ -207,6 +208,45 @@ def rules(layer: int | None = None) -> dict[str, Any]:
     }
 
 
+@app.get("/api/knowledge")
+def knowledge() -> dict[str, Any]:
+    """What the knowledge base is made of, for the About page.
+
+    Read-only reporting over structures that already exist. Rules were already listed by
+    /api/rules; the fact types (predicates) were not exposed anywhere, so a page describing the
+    system could state how many rules it has but not how many kinds of fact they reason over.
+    """
+    predicates = sorted(PREDICATES.values(), key=lambda p: (p.layer, p.name))
+    by_layer: dict[int, int] = {}
+    for spec in predicates:
+        by_layer[spec.layer] = by_layer.get(spec.layer, 0) + 1
+
+    rules_by_layer: dict[int, int] = {}
+    provenance: dict[str, int] = {}
+    for rule in KNOWLEDGE_BASE:
+        rules_by_layer[rule.layer] = rules_by_layer.get(rule.layer, 0) + 1
+        provenance[rule.provenance.value] = provenance.get(rule.provenance.value, 0) + 1
+
+    return {
+        "rules": len(KNOWLEDGE_BASE),
+        "fact_types": len(predicates),
+        "mandatory_fact_types": sum(1 for p in predicates if p.mandatory),
+        "cases": len(library()),
+        "fact_types_by_layer": {str(k): v for k, v in sorted(by_layer.items())},
+        "rules_by_layer": {str(k): v for k, v in sorted(rules_by_layer.items())},
+        "rules_by_provenance": provenance,
+        "facts": [
+            {
+                "name": spec.name,
+                "layer": spec.layer,
+                "description": spec.description,
+                "mandatory": spec.mandatory,
+            }
+            for spec in predicates
+        ],
+    }
+
+
 @app.get("/api/audit")
 def audit() -> dict[str, Any]:
     """The static rule-base audit, so the site can show the system checking itself."""
@@ -252,7 +292,21 @@ async def not_found(request: Request, exc: Any) -> JSONResponse | FileResponse:
     return JSONResponse({"detail": "Not found"}, status_code=404)
 
 
+class _RevalidatingStaticFiles(StaticFiles):
+    """Static files that the browser must revalidate before reuse.
+
+    Without a Cache-Control header a browser applies its own heuristic and may keep serving a
+    stale script after the file on disk has changed, which during development looks exactly
+    like a fix that did not work. no-cache still permits a cheap 304 via the ETag.
+    """
+
+    async def get_response(self, path: str, scope: Any) -> Any:
+        response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 if FRONTEND_DIR.is_dir():
     # Local convenience only. On Render the front end is not deployed alongside this service,
     # so this mount simply does not apply.
-    app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="site")
+    app.mount("/", _RevalidatingStaticFiles(directory=FRONTEND_DIR, html=True), name="site")

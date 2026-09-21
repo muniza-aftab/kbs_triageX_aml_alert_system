@@ -24,6 +24,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from triagex.data.loader import CASE_DIR, factbase_for, load_case, load_library
+from triagex.kb.knowledge_base import KNOWLEDGE_BASE
 from triagex.kb.predicates import DISPOSITIONS, PREDICATES
 from triagex.pipeline import assess, assess_measurements
 from triagex.plain import (
@@ -331,7 +332,7 @@ def test_static_site_is_served(client: TestClient) -> None:
 # The pages themselves
 # --------------------------------------------------------------------------------------
 
-PAGES = ("index.html", "assess.html", "cases.html", "case.html", "about.html")
+PAGES = ("index.html", "assess.html", "cases.html", "case.html", "history.html", "about.html")
 
 
 @pytest.mark.parametrize("page", PAGES)
@@ -370,8 +371,8 @@ def test_no_framework_or_cdn_is_used(page: str) -> None:
 
 def test_no_page_uses_innerhtml_with_interpolation() -> None:
     """Content comes from the API, so it goes through text nodes, not string concatenation."""
-    script = (WEB / "static/js/app.js").read_text(encoding="utf-8")
-    assert "innerHTML" not in script
+    for script in sorted((WEB / "static/js").glob("*.js")):
+        assert "innerHTML" not in script.read_text(encoding="utf-8"), script.name
     for page in PAGES:
         assert "innerHTML" not in (WEB / page).read_text(encoding="utf-8")
 
@@ -447,9 +448,10 @@ def test_every_script_parses() -> None:
         pytest.skip("node is not installed")
 
     scripts: list[tuple[str, str]] = [
-        ("static/js/app.js", (WEB / "static/js/app.js").read_text(encoding="utf-8")),
-        ("config.js", (WEB / "config.js").read_text(encoding="utf-8")),
+        (f"static/js/{path.name}", path.read_text(encoding="utf-8"))
+        for path in sorted((WEB / "static/js").glob("*.js"))
     ]
+    scripts.append(("config.js", (WEB / "config.js").read_text(encoding="utf-8")))
     for page in PAGES:
         html = (WEB / page).read_text(encoding="utf-8")
         for i, body in enumerate(re.findall(r'<script type="module">(.*?)</script>', html, re.S)):
@@ -461,3 +463,40 @@ def test_every_script_parses() -> None:
             path.write_text(source, encoding="utf-8")
             result = subprocess.run([node, "--check", str(path)], capture_output=True, text=True)
             assert result.returncode == 0, f"{name} does not parse:\n{result.stderr}"
+
+
+def test_knowledge_endpoint_reports_the_knowledge_base(client: TestClient) -> None:
+    """The About page states rule and fact counts; they must come from the system itself."""
+    data = client.get("/api/knowledge").json()
+    assert data["rules"] == len(KNOWLEDGE_BASE)
+    assert data["fact_types"] == len(PREDICATES) == len(data["facts"])
+    assert sum(data["fact_types_by_layer"].values()) == data["fact_types"]
+    assert sum(data["rules_by_layer"].values()) == data["rules"]
+    assert sum(data["rules_by_provenance"].values()) == data["rules"]
+    assert data["mandatory_fact_types"] == sum(1 for p in PREDICATES.values() if p.mandatory)
+
+
+def test_every_page_links_every_section() -> None:
+    """The navigation is the user journey; every page must offer all of it."""
+    for page in PAGES:
+        text = (WEB / page).read_text(encoding="utf-8")
+        for href in ("/assess.html", "/cases.html", "/history.html", "/about.html"):
+            assert f'href="{href}"' in text, f"{page} does not link {href}"
+
+
+def test_fonts_are_self_hosted() -> None:
+    """Typography must not depend on a third-party font service."""
+    css = (WEB / "static/css/main.css").read_text(encoding="utf-8")
+    assert "fonts.googleapis" not in css and "fonts.gstatic" not in css
+    for name in ("inter-var.woff2", "source-serif-4-var.woff2", "jetbrains-mono-var.woff2"):
+        assert (WEB / "static/fonts" / name).is_file(), name
+        assert f"/static/fonts/{name}" in css
+
+
+def test_static_scripts_are_revalidated_rather_than_frozen() -> None:
+    """Unversioned files must never be cached as immutable, or deploys do not reach returning visitors."""
+    config = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
+    for rule in config["headers"]:
+        values = [h["value"] for h in rule["headers"] if h["key"] == "Cache-Control"]
+        if any("immutable" in v for v in values):
+            assert rule["source"].startswith("/static/fonts/"), rule["source"]
